@@ -151,3 +151,6 @@ $RECYCLE.BIN/
 *.DS_Store
 BoulderCo/CityLights/Textures/detaildark.png
 BoulderCo/CityLights/Textures/detaillight.png
+
+# Oblate saturn cache
+RealSolarSystem/GameData/RealSolarSystem/RSSKopernicus/Saturn/Cache/*.bin
