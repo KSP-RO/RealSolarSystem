@@ -1594,7 +1594,6 @@ namespace RealSolarSystem
                                         }
                                         print("Generic disable: " + mName + " with idx: " + idx + "; doAll: " + doAll);
                                         int cur = 0;
-                                        int i = 0;
                                         foreach (var m in mods)
                                         {
                                             if (modNode.name.Equals(m.GetType().Name))
@@ -1872,8 +1871,8 @@ namespace RealSolarSystem
                                 yield return null;
                                 //OnGui();
                             }
-                            atmo = t.FindChild("Atmosphere");
                         }
+                        atmo = t.FindChild("Atmosphere");
                         //OnGui();
                         if (rescale)
                         {

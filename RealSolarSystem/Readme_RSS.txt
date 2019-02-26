@@ -48,6 +48,18 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.6.1
+* Removed clip value, things shouldn't flicker as badly.
+
+v8.6
+* Fixed Ganymede normal map being flipped (either redownload your texture pack or just get the fixed Ganymede normal map, it's the same for all packs) -- thanks sashan!
+* Starwaster: fix temperature and pressure issues on some bodies due to multipliers not being reset.
+* Removed keypress-based camera clipping changes. There's a GUI for that, after all...
+* Fixed camera clipping range loading.
+* Fixed finding AtmosphereFromGround (was only running if the body had a PQS--Jool does not).
+* Added a :FOR[RSSConfig] tag, so people can :NEEDS off that, rather than RealSolarSystem (:NEEDS[RealSolarSystem] will return true no matter what config for RSS one has, even if it's just to prettify the atmosphers like in a visual pack).
+* Update to Module Manager 2.5.12 and DDS Loader 1.9
+
 v8.5
 *Fix Venus/Mars colors not showing up right (well, work around it...) NOTE YOU NEED THE DDS TEXTURES FOR THIS TO WORK.
 *Fix editor extents/camera fixing

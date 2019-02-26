@@ -14,8 +14,10 @@ namespace RealSolarSystem
     public class RSSWatchDog : MonoBehaviour
     {
         ConfigNode RSSSettings = null;
-        int updateCount = 0;
-        bool useKeypressClip = false;
+        double delayCounter = 0;
+        const double initialDelay = 1; // 1 second wait before cam fixing
+
+        bool watchdogRun = false;
         protected bool isCompatible = true;
         public void Start()
         {
@@ -32,7 +34,6 @@ namespace RealSolarSystem
             if (RSSSettings != null)
             {
                 RSSSettings.TryGetValue("dumpOrbits", ref dumpOrbits);
-                RSSSettings.TryGetValue("useKeypressClip", ref useKeypressClip);
             }
 
             UpdateAtmospheres();
@@ -53,63 +54,53 @@ namespace RealSolarSystem
             if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
                 return;
 
-            if(!useKeypressClip && updateCount > 22)
+            if (watchdogRun)
                 return;
-            updateCount++;
-            if(updateCount < 20 || (useKeypressClip && !Input.GetKeyDown(KeyCode.P)))
+            delayCounter += TimeWarp.fixedDeltaTime;
+
+            if(delayCounter < initialDelay)
                 return;
+
+            watchdogRun = true;
             
             Camera[] cameras = Camera.allCameras;
-            string msg = "Far clip planes now";
             string bodyName = FlightGlobals.getMainBody().name;
             foreach (Camera cam in cameras)
             {
-                if (cam.name == "Camera 01" || cam.name == "Camera 00")
+                float farClip = -1;
+                float nearClip = -1;
+                if (cam.name.Equals("Camera 00"))
                 {
-                    if (useKeypressClip)
-                        cam.farClipPlane *= 1.5f;
-                    else
-                    {
-                        float farClip = -1;
-                        float nearClip = -1;
-                        if (cam.name.Equals("Camera 00"))
-                        {
-                            RSSSettings.TryGetValue("cam00FarClip", ref farClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
-                            RSSSettings.TryGetValue("cam00NearClip", ref nearClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
-                        }
-                        else if (cam.name.Equals("Camera 01"))
-                        {
-                            RSSSettings.TryGetValue("cam01FarClip", ref farClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
-                            RSSSettings.TryGetValue("cam01NearClip", ref nearClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
-                        }
-                        else if (cam.name.Equals("Camera ScaledSpace"))
-                        {
-                            RSSSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
-                            RSSSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
-                            if (RSSSettings.HasNode(bodyName))
-                                RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
-                        }
-                        if (farClip > 0)
-                            cam.farClipPlane = farClip;
-                        if (nearClip > 0)
-                            cam.nearClipPlane = nearClip;
-                    }
-
-                    msg += "  (" + cam.name + "): " + cam.farClipPlane + ".";
+                    RSSSettings.TryGetValue("cam00FarClip", ref farClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
+                    RSSSettings.TryGetValue("cam00NearClip", ref nearClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
                 }
+                else if (cam.name.Equals("Camera 01"))
+                {
+                    RSSSettings.TryGetValue("cam01FarClip", ref farClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
+                    RSSSettings.TryGetValue("cam01NearClip", ref nearClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
+                }
+                else if (cam.name.Equals("Camera ScaledSpace"))
+                {
+                    RSSSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    RSSSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                    if (RSSSettings.HasNode(bodyName))
+                        RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                }
+                if (farClip > 0)
+                    cam.farClipPlane = farClip;
+                if (nearClip > 0)
+                    cam.nearClipPlane = nearClip;
             }
-            if(useKeypressClip)
-                ScreenMessages.PostScreenMessage(msg, 5.0f, ScreenMessageStyle.UPPER_CENTER);
         }
 
         double counter = 0;
