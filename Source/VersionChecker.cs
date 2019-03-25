@@ -36,12 +36,12 @@ namespace RealSolarSystem
      * to be incompatible with the current running version of Kerbal Space Program.
      *
      * See this forum thread for details:
-     * http://forum.kerbalspaceprogram.com/threads/65395-Voluntarily-Locking-Plugins-to-a-Particular-KSP-Version
+     * https://forum.kerbalspaceprogram.com/index.php?showtopic=59388
      */
 
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
 
-    internal class CompatibilityChecker : MonoBehaviour
+    class CompatibilityChecker : MonoBehaviour
     {
         public static bool IsCompatible()
         {
@@ -49,7 +49,6 @@ namespace RealSolarSystem
             |    BEGIN IMPLEMENTATION-SPECIFIC EDITS HERE.    |
             \*-----------------------------------------------*/
 
-            //
             // If you want to disable some behavior when incompatible, other parts of the plugin
             // should query this method:
             //
@@ -59,8 +58,8 @@ namespace RealSolarSystem
             //
             // Even if you don't lock down functionality, you should return true if your users
             // can expect a future update to be available.
-            //
-            return Versioning.version_major == 1 && Versioning.version_minor == 4;
+
+            return Versioning.version_major == 1 && Versioning.version_minor == 6;
 
             /*-----------------------------------------------*\
             | IMPLEMENTERS SHOULD NOT EDIT BEYOND THIS POINT! |
@@ -84,7 +83,7 @@ namespace RealSolarSystem
 
         static int _version = 6;
 
-        public void Start()
+        void Start()
         {
             // Checkers are identified by the type name and version field name.
 
@@ -188,11 +187,6 @@ namespace RealSolarSystem
             {
                 PopupDialog.SpawnPopupDialog(new Vector2(0, 0), new Vector2(0, 0), "CompatibilityChecker", "Incompatible Mods Detected", message, "OK", true, HighLogic.UISkin, true, string.Empty);
             }
-        }
-
-        public static bool IsWin64()
-        {
-            return (IntPtr.Size == 8) && (Environment.OSVersion.Platform == PlatformID.Win32NT);
         }
 
         public static bool IsAllCompatible()

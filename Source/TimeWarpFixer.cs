@@ -3,6 +3,7 @@
 namespace RealSolarSystem
 {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+
     public class TimeWarpFixer : MonoBehaviour
     {
         public double lastTime = 0;
@@ -12,8 +13,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
-                isCompatible = false;
+            isCompatible &= CompatibilityChecker.IsCompatible ();
             fixedTimeWarp = false;
 
             GameSettings.KERBIN_TIME = false;
@@ -25,14 +25,20 @@ namespace RealSolarSystem
             if (!isCompatible)
                 return;
 
-            // Fix Timewarp
+            // Update the TimeWarp rates.
+
             if (!fixedTimeWarp && TimeWarp.fetch != null)
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
+
                 foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                     twNode = node.GetNode("timeWarpRates");
+
+                Debug.Log("[RealSolarSystem]: Setting TimeWarp rates...");
+
                 float ftmp;
+
                 if (twNode != null)
                 {
                     for (int i = 1; i < 8; i++)
@@ -42,6 +48,7 @@ namespace RealSolarSystem
                                 TimeWarp.fetch.warpRates[i] = ftmp;
                     }
                 }
+
                 Destroy(this);
             }
         }
