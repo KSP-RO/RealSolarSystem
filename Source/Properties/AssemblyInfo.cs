@@ -38,3 +38,6 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyVersion("0.18.0.0")]
 [assembly: AssemblyFileVersion("0.18.0.0")]
+
+[assembly: KSPAssemblyDependency("Kopernicus", 1, 0)]
+[assembly: KSPAssemblyDependency("Kopernicus.Parser", 1, 0)]
