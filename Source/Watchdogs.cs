@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace RealSolarSystem
 {
@@ -38,13 +39,26 @@ namespace RealSolarSystem
 
             delayCounter += Time.deltaTime;
 
-            if(delayCounter < initialDelay)
+            if (delayCounter < initialDelay)
                 return;
 
             watchdogRun = true;
 
             Camera[] cameras = Camera.allCameras;
             string bodyName = FlightGlobals.getMainBody().name;
+
+            ConfigNode clipPlaneSettings;
+            if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11 ||
+                SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12)
+            {
+                clipPlaneSettings = rssSettings.GetNode("ClipPlanes")?.GetNode("DX11");
+            }
+            else
+            {
+                clipPlaneSettings = rssSettings.GetNode("ClipPlanes")?.GetNode("Other");
+            }
+
+            if (clipPlaneSettings == null) return;
 
             foreach (Camera cam in cameras)
             {
@@ -53,52 +67,50 @@ namespace RealSolarSystem
 
                 if (cam.name.Equals("Camera 00"))
                 {
-                    rssSettings.TryGetValue("cam00FarClip", ref farClip);
+                    clipPlaneSettings.TryGetValue("cam00FarClip", ref farClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
 
-                    rssSettings.TryGetValue("cam00NearClip", ref nearClip);
+                    clipPlaneSettings.TryGetValue("cam00NearClip", ref nearClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
                 }
                 else if (cam.name.Equals("Camera 01"))
                 {
-                    rssSettings.TryGetValue("cam01FarClip", ref farClip);
+                    clipPlaneSettings.TryGetValue("cam01FarClip", ref farClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
 
-                    rssSettings.TryGetValue("cam01NearClip", ref nearClip);
+                    clipPlaneSettings.TryGetValue("cam01NearClip", ref nearClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
                 }
                 else if (cam.name.Equals("Camera ScaledSpace"))
                 {
-                    rssSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    clipPlaneSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
 
-                    rssSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                    clipPlaneSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
 
-                    if (rssSettings.HasNode(bodyName))
-                        rssSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                    if (clipPlaneSettings.HasNode(bodyName))
+                        clipPlaneSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
                 }
 
                 if (nearClip > 0)
                 {
                     cam.nearClipPlane = nearClip;
-
                     Debug.Log($"[RealSolarSystem] Watchdog: Setting camera {cam.name} near clip to {nearClip} so camera now has {cam.nearClipPlane}");
                 }
 
                 if (farClip > 0)
                 {
                     cam.farClipPlane = farClip;
-
                     Debug.Log($"[RealSolarSystem] Watchdog: Setting camera {cam.name} far clip to {farClip} so camera now has {cam.farClipPlane}");
                 }
             }

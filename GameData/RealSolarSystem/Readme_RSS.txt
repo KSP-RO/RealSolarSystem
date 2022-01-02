@@ -36,14 +36,44 @@ RealSolarSystem ships with configurations for many other mods:
 - Ferram Aerospace Research by ferram4. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=19321
 - Not In My BackYard by magico13, and LinuxGuruGamer. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=178484
 - PlanetShine by Valerian, and Papa_Joe. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?/showtopic=173138
-- RemoteTech by Peppie23, and the Remote Technologies Group. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=139167
-- SCANSat by damny, and DMagic. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72679
 - TextureReplacer by shaw. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=96851
 
 FINAL NOTES:
 You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
 ===========================
+Changelog
+v18.5.0
+* Add Russian localization, @eggrobin
+
+Changelog
+v18.4.0
+* Fix clip planes for OpenGL, @siimav
+
+Changelog
+v18.3.0
+* Fix too low clip plane value which caused artifacts to appear near the horizon, @siimav
+* Fix KSC runway becoming bumpy if KK is installed, @NathanKell
+
+v18.2.0
+* Fix wrong atmospheric pressure being shown in CelestialBody KBApp @NathanKell
+* Set default surface/orbital navball transition altitude for all bodies @al2me6
+* French body names by @eggrobin in #244
+* Fix the bad tangent in Venus pressureCurve @siimav
+* Add comets to Custom Asteroids config by @Starstrider42 in #226
+
+v18.1.5
+* Support KSCSwitcher's dynamic grass color (#242), @Standecco
+* Use 3D orbits when Kopernicus supports this, @siimav
+* Add Churchill Rocket Research Range launch site (#218) @lpgagnon
+
+v18.1.4
+* Fix the Icy Lunar surface, @siimav
+* Create RationalResources.cfg, @DRVeyl
+* Add space low altitude (#229), @RCrockford
+* Add Mahia LaunchSiteTrackingStation (#230), @RCrockford
+* Fix some vesta biome colors (#221), @lpgagnon
+
 Changelog
 v18.1.3
 * Make the dishes that hover over the KSC invisible, @siimav

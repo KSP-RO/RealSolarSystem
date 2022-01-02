@@ -30,7 +30,7 @@ namespace RealSolarSystem
 
         private string[] collidersToFix =
         {
-            "Section4", "Section3", "Section2", "Section1", "End27", "End09",
+            "End09", "Section4", "Section3", "Section2", "Section1", "End27"
         };
         
         public void Start()
@@ -43,7 +43,7 @@ namespace RealSolarSystem
                 {
                     debug = bTemp;
                 }
-                if (float.TryParse(n.GetValue("debug"), out float fTemp))
+                if (float.TryParse(n.GetValue("holdThreshold"), out float fTemp))
                 {
                     holdThreshold = fTemp;
                 }
@@ -255,27 +255,34 @@ namespace RealSolarSystem
         {
             foreach (string c in collidersToFix)
             {
-                GameObject o = GameObject.Find(c);
-                if (o == null)
+                bool notFound = true;
+                foreach (GameObject o in Resources.FindObjectsOfTypeAll<GameObject>())
                 {
-                    if (debug) PrintDebug($"Object {c} not found, skipping");
-                    continue;
-                }
-                if (!o.activeInHierarchy)
-                {
-                    if (debug) PrintDebug($"{o.name} is not active, skipping");
-                    continue;
-                }
+                    if (o.name != c)
+                        continue;
 
-                MeshCollider cl = o.GetComponentInChildren<MeshCollider>();
-                if (cl == null)
+                    notFound = false;
+                    if (!o.activeInHierarchy)
+                    {
+                        if (debug) PrintDebug($"{o.name} is not active, skipping");
+                        continue;
+                    }
+
+                    MeshCollider cl = o.GetComponentInChildren<MeshCollider>();
+                    if (cl == null)
+                    {
+                        if (debug) PrintDebug($" No mesh collider in {c}");
+                        continue;
+                    }
+                    if (debug) PrintDebug($" disabling {cl.name}");
+                    cl.enabled = false;
+                }
+                if (notFound)
                 {
-                    if (debug) PrintDebug($"No mesh collider in {c}");
+                    if (debug) PrintDebug($" Object {c} not found, skipping");
                     continue;
                 }
-                if (debug) PrintDebug($"disabling {cl.name}");
-                cl.enabled = false;
             }
-        }
+            }
     }
 }

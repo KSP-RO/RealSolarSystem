@@ -1,0 +1,38 @@
+spec_version: v1.12
+identifier: RealSolarSystem
+name: Real Solar System
+abstract: >-
+  Resizes and rearranges the Kerbal system to more closely resemble the Solar
+  System
+author:
+  - NathanKell
+  - eggrobin
+  - raidernick
+  - PhineasFreak
+$kref: '#/ckan/github/KSP-RO/RealSolarSystem'
+$vref: '#/ckan/ksp-avc'
+x_netkan_force_v: true
+license: CC-BY-NC-SA
+release_status: stable
+resources:
+  homepage: https://forum.kerbalspaceprogram.com/index.php?/topic/177216-*
+tags:
+  - planet-pack
+  - config
+  - plugin
+  - resources
+depends:
+  - name: ModuleManager
+  - name: Kopernicus
+    min_version: 2:release-1.11.1-39
+  - name: RSSTextures
+provides:
+  - CustomAsteroids-Pops
+recommends:
+  - name: RealismOverhaul
+  - name: KSCSwitcher
+  - name: RSSDateTimeFormatter
+  - name: RSSVE-Textures
+install:
+  - find: RealSolarSystem
+    install_to: GameData
