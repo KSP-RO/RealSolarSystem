@@ -141,6 +141,11 @@ namespace RealSolarSystem
             GUILayout.Label("RSSRunwayFix");
 
             GUILayout.BeginHorizontal();
+            GUILayout.Label("collidersDisabled: ");
+            GUILayout.Label(RSSRunwayFix.Instance.collidersDisabled.ToString(), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
             GUILayout.Label("isOnRunway: ");
             GUILayout.Label(RSSRunwayFix.Instance.isOnRunway.ToString(), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();

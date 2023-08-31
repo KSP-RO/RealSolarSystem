@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using static RunwayCollisionHandler;
 
 namespace RealSolarSystem
 {
@@ -22,16 +23,12 @@ namespace RealSolarSystem
         internal bool isOnRunway = false;
         internal string lastHitColliderName;
 
+        internal bool collidersDisabled = false;
         private bool waiting = false;
         private IEnumerator waitCoro = null;
         private bool coroComplete = false;
 
-        private Vector3 down;
-
-        private string[] collidersToFix =
-        {
-            "End09", "Section4", "Section3", "Section2", "Section1", "End27"
-        };
+        private Coroutine _sectionsLoadRoutine;
 
         public static RSSRunwayFix Instance { get; private set; } = null;
 
@@ -46,46 +43,51 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            PrintDebug("Start");
-
             foreach (ConfigNode n in GameDatabase.Instance.GetConfigNodes("RSSRUNWAYFIX"))
             {
                 if (bool.TryParse(n.GetValue("debug"), out bool bTemp))
                 {
                     debug = bTemp;
                 }
+
                 if (float.TryParse(n.GetValue("holdThreshold"), out float fTemp))
                 {
                     holdThreshold = fTemp;
                 }
             }
 
-            GameEvents.onVesselGoOffRails.Add (OnVesselGoOffRails);
-            GameEvents.onVesselGoOnRails.Add (OnVesselGoOnRails);
-            GameEvents.onVesselSwitching.Add (OnVesselSwitching);
-            GameEvents.onVesselSituationChange.Add (OnVesselSituationChange);
-
-            //GameEvents.onFloatingOriginShift.Add(onFloatingOriginShift);
+            GameEvents.onVesselGoOffRails.Add(OnVesselGoOffRails);
+            GameEvents.onVesselGoOnRails.Add(OnVesselGoOnRails);
+            GameEvents.onVesselSwitching.Add(OnVesselSwitching);
+            GameEvents.onVesselSituationChange.Add(OnVesselSituationChange);
+            DestructibleBuilding.OnLoaded.Add(OnSectionLoaded);
         }
 
         public void OnDestroy()
         {
-            PrintDebug("OnDestroy");
-            GameEvents.onVesselGoOffRails.Remove (OnVesselGoOffRails);
-            GameEvents.onVesselGoOnRails.Remove (OnVesselGoOnRails);
-            GameEvents.onVesselSwitching.Remove (OnVesselSwitching);
+            GameEvents.onVesselGoOffRails.Remove(OnVesselGoOffRails);
+            GameEvents.onVesselGoOnRails.Remove(OnVesselGoOnRails);
+            GameEvents.onVesselSwitching.Remove(OnVesselSwitching);
             GameEvents.onVesselSituationChange.Remove(OnVesselSituationChange);
-
-            //GameEvents.onFloatingOriginShift.Remove(onFloatingOriginShift);
+            DestructibleBuilding.OnLoaded.Remove(OnSectionLoaded);
         }
 
-        public void OnFloatingOriginShift(Vector3d v0, Vector3d v1)
+        private void OnSectionLoaded(DestructibleBuilding data)
         {
-            if (!hold)
+            // At the end of the frame, KSP will fire this event for every destructible KSC prop.
+            // We wait until the next frame so that all of the runway sections are guaranteed to be loaded.
+            if (!collidersDisabled && _sectionsLoadRoutine == null)
             {
-                return;
+                _sectionsLoadRoutine = StartCoroutine(SectionsLoadRoutine());
             }
-            if (debug) PrintDebug($"RSSRWF: v0: {v0}, v1: {v1}, threshold: {FloatingOrigin.fetch.threshold}");
+        }
+
+        private IEnumerator SectionsLoadRoutine()
+        {
+            yield return null;
+
+            TryDisableColliders();
+            _sectionsLoadRoutine = null;
         }
 
         public void OnVesselGoOnRails(Vessel v)
@@ -97,25 +99,19 @@ namespace RealSolarSystem
 
         public void OnVesselGoOffRails(Vessel v)
         {
-            PrintDebug("started");
-
             originalThreshold = FloatingOrigin.fetch.threshold;
             originalThresholdSqr = FloatingOrigin.fetch.thresholdSqr;
 
             if (debug) PrintDebug($"original threshold={originalThreshold}");
             holdThresholdSqr = holdThreshold * holdThreshold;
 
-            GameObject end09 = GameObject.Find(collidersToFix[0]);
-            if (end09 == null)
+            if (!collidersDisabled)
             {
-                PrintDebug("no end09 found");
+                if (debug) PrintDebug("colliders not disabled yet");
                 hold = false;
                 return;
             }
 
-            //combine(end09.transform.parent.gameObject);
-            DisableColliders();
-            GetDownwardVector();
             hold = true;
             waiting = false;
         }
@@ -128,14 +124,13 @@ namespace RealSolarSystem
                 return;
             }
 
-            GetDownwardVector();
             waiting = false;
         }
 
-        private void GetDownwardVector()
+        private Vector3 GetDownwardVector()
         {
             Vessel v = FlightGlobals.ActiveVessel;
-            down = (v.CoM - v.mainBody.transform.position).normalized * -1;
+            return (v.CoM - v.mainBody.transform.position).normalized * -1;
         }
 
         public void OnVesselSituationChange(GameEvents.HostedFromToAction<Vessel, Vessel.Situations> data)
@@ -146,19 +141,19 @@ namespace RealSolarSystem
             }
             
             hold = data.to == Vessel.Situations.LANDED;
-            PrintDebug($"vessel: {data.host.vesselName}, situation: {data.to}, hold: {hold}");
+            if (debug) PrintDebug($"vessel: {data.host.vesselName}, situation: {data.to}, hold: {hold}");
 
             if (!hold && FloatingOrigin.fetch.threshold > originalThreshold && originalThreshold > 0)
             {
-                PrintDebug($"coro: {waitCoro}, complete: {coroComplete}");
+                if (debug) PrintDebug($"coro: {waitCoro}, complete: {coroComplete}");
                 if (waitCoro != null && !coroComplete)
                 {
-                    PrintDebug("stopping coro");
+                    if (debug) PrintDebug("stopping coro");
                     StopCoroutine(waitCoro);
                 }
 
                 waitCoro = RestoreThreshold();
-                PrintDebug($"created new coro: {waitCoro}");
+                if (debug) PrintDebug($"created new coro: {waitCoro}");
 
                 coroComplete = false;
                 StartCoroutine(waitCoro);
@@ -174,17 +169,18 @@ namespace RealSolarSystem
                 waiting = true;
                 yield return new WaitForSeconds(5);
                 waiting = false;
-                PrintDebug("waiting is over");
+                if (debug) PrintDebug("waiting is over");
             }
 
             // Check again as situation could have changed
-            if (!hold && FloatingOrigin.fetch.threshold > originalThreshold && originalThreshold > 0) {
+            if (!hold && FloatingOrigin.fetch.threshold > originalThreshold && originalThreshold > 0)
+            {
                 if (debug) PrintDebug($"Restoring original thresholds ({FloatingOrigin.fetch.threshold} > {originalThreshold}), "+
                                       $"alt={FlightGlobals.ActiveVessel.radarAltitude}");
                 FloatingOrigin.fetch.threshold = originalThreshold;
                 FloatingOrigin.fetch.thresholdSqr = originalThresholdSqr;
             }
-            PrintDebug("coro finished");
+            if (debug) PrintDebug("coro finished");
             coroComplete = true;
         }
 
@@ -228,13 +224,12 @@ namespace RealSolarSystem
             }
             
             Vessel v = FlightGlobals.ActiveVessel;
-            if (v.situation != Vessel.Situations.LANDED && v.situation != Vessel.Situations.PRELAUNCH)
+            if (v == null || (v.situation != Vessel.Situations.LANDED && v.situation != Vessel.Situations.PRELAUNCH))
             {
                 return false;
             }
-            
-            GetDownwardVector();
 
+            Vector3 down = GetDownwardVector();
             bool hit = Physics.Raycast(v.transform.position, down, out RaycastHit raycastHit, 100, layerMask);
             if (!hit)
             {
@@ -243,17 +238,12 @@ namespace RealSolarSystem
             
             lastHitColliderName = raycastHit.collider.gameObject.name;
             //if (debug) printDebug($"hit collider: {colliderName}");
-            if (lastHitColliderName != "runway_collider")
-            {
-                return false;
-            }
 
-            return true;
+            return lastHitColliderName == "runway_collider";
         }
 
         internal void PrintDebug(string message)
         {
-
             if (!debug) return;
 
             var trace = new System.Diagnostics.StackTrace();
@@ -262,38 +252,26 @@ namespace RealSolarSystem
             Debug.Log($"[RealSolarSystem] {caller}:{line}: {message}");
         }
 
-        private void DisableColliders()
+        private void TryDisableColliders()
         {
-            foreach (string c in collidersToFix)
+            // Once disabled, the colliders will stay disabled
+            if (collidersDisabled) return;
+
+            var rwHandler = FindObjectOfType<RunwayCollisionHandler>();
+            if (rwHandler == null)
             {
-                bool notFound = true;
-                foreach (GameObject o in Resources.FindObjectsOfTypeAll<GameObject>())
-                {
-                    if (o.name != c)
-                        continue;
-
-                    notFound = false;
-                    if (!o.activeInHierarchy)
-                    {
-                        if (debug) PrintDebug($"{o.name} is not active, skipping");
-                        continue;
-                    }
-
-                    MeshCollider cl = o.GetComponentInChildren<MeshCollider>();
-                    if (cl == null)
-                    {
-                        if (debug) PrintDebug($" No mesh collider in {c}");
-                        continue;
-                    }
-                    if (debug) PrintDebug($" disabling {cl.name}");
-                    cl.enabled = false;
-                }
-                if (notFound)
-                {
-                    if (debug) PrintDebug($" Object {c} not found, skipping");
-                    continue;
-                }
+                if (debug) PrintDebug("rwHandler is null");
+                return;
             }
+
+            foreach (RunwaySection section in rwHandler.runwaySections)
+            {
+                Collider sc = section.sectionCollider;
+                sc.enabled = false;
             }
+
+            collidersDisabled = true;
+            if (debug) PrintDebug("disabled runway colliders");
+        }
     }
 }
