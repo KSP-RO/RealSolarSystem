@@ -44,6 +44,8 @@
     <Compile Include="CameraWrapper.cs" />
     <Compile Include="CommNetFixer.cs" />
     <Compile Include="GUI.cs" />
+    <Compile Include="HarmonyPatcher.cs" />
+    <Compile Include="Harmony\Vessel.cs" />
     <Compile Include="InstallationChecker.cs" />
     <Compile Include="KopernicusMods\MapSODemandLarge.cs" />
     <Compile Include="KopernicusMods\PQSMod_VertexDefineCoastSmooth.cs" />
@@ -58,6 +60,9 @@
     <Compile Include="Watchdogs.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <Private>False</Private>
     </Reference>
