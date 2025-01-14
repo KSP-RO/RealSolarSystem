@@ -34,6 +34,8 @@ recommends:
   - name: RSSDateTimeFormatter
   - name: RSSVE-Textures
   - name: Parallax
+supports:
+  - name: Principia
 install:
   - find: RealSolarSystem
     install_to: GameData
