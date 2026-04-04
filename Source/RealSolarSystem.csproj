@@ -47,11 +47,8 @@
     <Compile Include="HarmonyPatcher.cs" />
     <Compile Include="Harmony\Vessel.cs" />
     <Compile Include="InstallationChecker.cs" />
-    <Compile Include="KopernicusMods\MapSODemandLarge.cs" />
     <Compile Include="KopernicusMods\PQSMod_VertexDefineCoastSmooth.cs" />
-    <Compile Include="KopernicusMods\PQSMod_VertexHeightMapRSS.cs" />
     <Compile Include="KopernicusMods\VertexDefineCoastSmooth.cs" />
-    <Compile Include="KopernicusMods\VertexHeightMapRSS.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RSSRunwayFix.cs" />
     <Compile Include="StartupPopup.cs" />

@@ -50,7 +50,7 @@ namespace RealSolarSystem
         private PQSMod_QuadEnhanceCoast _pModEnhance = null;
         private PQSMod_VertexDefineCoastSmooth _pModRssDefine = null;
         private PQSMod_VertexHeightNoiseVertHeight _pModHeightNoise = null;
-        private PQSMod_VertexHeightMapRSS _pModRssHMap = null;
+        private PQSMod_VertexHeightMap _pModRssHMap = null;
 
         public void Update()
         {
@@ -187,7 +187,7 @@ namespace RealSolarSystem
                 _pModEnhance = (PQSMod_QuadEnhanceCoast)_modList.FirstOrDefault(t => t is PQSMod_QuadEnhanceCoast);
                 _pModRssDefine = (PQSMod_VertexDefineCoastSmooth)_modList.FirstOrDefault(t => t is PQSMod_VertexDefineCoastSmooth);
                 _pModHeightNoise = (PQSMod_VertexHeightNoiseVertHeight)_modList.FirstOrDefault(t => t is PQSMod_VertexHeightNoiseVertHeight);
-                _pModRssHMap = (PQSMod_VertexHeightMapRSS)_modList.FirstOrDefault(t => t is PQSMod_VertexHeightMapRSS);
+                _pModRssHMap = (PQSMod_VertexHeightMap)_modList.FirstOrDefault(t => t is PQSMod_VertexHeightMap);
             }
 
             PQSCache.PQSSpherePreset preset = PQSCache.PresetList?.GetPreset(pqs.gameObject.name);
