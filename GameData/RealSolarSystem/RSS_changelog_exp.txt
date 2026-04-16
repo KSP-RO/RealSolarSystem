@@ -1,0 +1,41 @@
+==================================================
+RSS restructure for KSP 1.12.5 (2026-04-16)
+==================================================
+
+Change Log:
+
+    - Compatible with RSS v20.1.3
+    - Surely a save-breaking update...
+    - Complete restructure of the directory tree (built upon pull #306)
+    - All mod compatibility patches now reside under the (existing) "Compatibility" directory
+    - All RSS-specific patches now reside under the "Config" directory
+    - All RSS-specific patches are now prefixed with "RSS_"
+    - All Kopernicus body cache files are now stored under the "PluginData/KopernicusCache" path
+    - Removed all PQS mods from the Earth (simplifies removal of various useless PQSCity mods)
+    - Removed the "cbNameLater" parameter from the Earth
+    - Removed the deprecated "lightColor" parameter from all bodies with atmospheres
+    - Removed the stock launch sites introduced with KSP version 1.12 ("Glacier Lake", "Cove", "Mahi Mahi", "Crater")
+    - Removed support for the "FinalFrontier" mod
+    - Removed support for the "RemoteTech" mod
+    - Removed support for the "PlanetShine" mod
+    - Renamed the KSCSwitcher patch from "LaunchSites" to "KSCSwitcher"
+    - Renamed the NIMBY patch from "RecoveryBeacons" to "NIMBY"
+
+Bug Fixes:
+
+    - Added navball switching handling for "altitude" and "atmosphereDepth" options (pull #286)
+    - Increased the space high threshold for Earth from 35786 km to 40000 km (issue #313)
+    - Decreased the flying high threshold for Earth from 50 km to 40 km (matches the RP-1 value)
+    - Increased the camera far clipping planes from ~1.9 Mm to 3 Mm (ported from RSSVE)
+    - Updated the Sun light parameters for compatibility with the newer Kopernicus versions
+    - Updated the CommNet patch to handle parts with more that one "ModuleDataTransmitter" modules
+    - Updated the science definitions for compatibility with the newer Module Manager versions (pull #315)
+    - Updated the TextureReplacer compatibility patch to edit the existing node instead of creating a new one
+    - Updated the Triton rotation period to use a hard-coded value (RSS now uses gravitational parameters for all bodies)
+    - Updated the Pluto and Charon rotation period to use hard-coded values (RSS now uses gravitational parameters for all bodies)
+
+Known Issues:
+
+    - The oblate feature for the gas giants does not work
+    - The KSC monolith cannot be removed (it is part of the space center mesh)
+    - The Sun has the stock yellow appearance instead of being clear white
