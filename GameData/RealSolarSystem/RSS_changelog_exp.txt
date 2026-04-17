@@ -27,15 +27,20 @@ Bug Fixes:
     - Increased the space high threshold for Earth from 35786 km to 40000 km (issue #313)
     - Decreased the flying high threshold for Earth from 50 km to 40 km (matches the RP-1 value)
     - Increased the camera far clipping planes from ~1.9 Mm to 3 Mm (ported from RSSVE)
-    - Updated the Sun light parameters for compatibility with the newer Kopernicus versions
-    - Updated the CommNet patch to handle parts with more that one "ModuleDataTransmitter" modules
-    - Updated the science definitions for compatibility with the newer Module Manager versions (pull #315)
-    - Updated the TextureReplacer compatibility patch to edit the existing node instead of creating a new one
+    - Fixed the Sun light parameters for compatibility with the newer Kopernicus versions
+    - Fixed the CommNet patch to handle parts with more that one "ModuleDataTransmitter" modules
+    - Fixed the science definitions for compatibility with the newer Module Manager versions (pull #315)
+    - Fixed the Titan AFG parameters for a smoother transition
+    - Fixed the overexposed specular reflections of the gas giants
+    - Fixed the TextureReplacer compatibility patch to edit the existing node instead of creating a new one
     - Updated the Triton rotation period to use a hard-coded value (RSS now uses gravitational parameters for all bodies)
     - Updated the Pluto and Charon rotation period to use hard-coded values (RSS now uses gravitational parameters for all bodies)
+    - Updated all PQS material nodes to use stock KSP textures (workaround until the RSS-supplied terrain detail textures are fixed)
 
 Known Issues:
 
     - The oblate feature for the gas giants does not work
     - The KSC monolith cannot be removed (it is part of the space center mesh)
-    - The Sun has the stock yellow appearance instead of being clear white
+    - The Sun has the stock yellow appearance instead of being white
+    - The terrain detail textures have incorrect glossiness factors
+    - The transition between SS and PQS for Vesta does not occur at the same altitude
