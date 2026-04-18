@@ -5,15 +5,16 @@ RSS restructure for KSP 1.12.5 (2026-04-16)
 Change Log:
 
     - Compatible with RSS v20.1.3
-    - Surely a save-breaking update...
+    - Maybe not a save-breaking update...
     - Complete restructure of the directory tree (built upon pull #306)
     - All mod compatibility patches now reside under the (existing) "Compatibility" directory
     - All RSS-specific patches now reside under the "Config" directory
     - All RSS-specific patches are now prefixed with "RSS_"
     - All Kopernicus body cache files are now stored under the "PluginData/KopernicusCache" path
+    - Added navball switching handling for "altitude" and "atmosphereDepth" options (pull #286)
+    - Added a normal map to Saturn (part of the "RSS-Textures" package)
     - Removed all PQS mods from the Earth (simplifies removal of various useless PQSCity mods)
     - Removed the "cbNameLater" parameter from the Earth
-    - Removed the deprecated "lightColor" parameter from all bodies with atmospheres
     - Removed the stock launch sites introduced with KSP version 1.12 ("Glacier Lake", "Cove", "Mahi Mahi", "Crater")
     - Removed support for the "FinalFrontier" mod
     - Removed support for the "RemoteTech" mod
@@ -23,24 +24,27 @@ Change Log:
 
 Bug Fixes:
 
-    - Added navball switching handling for "altitude" and "atmosphereDepth" options (pull #286)
     - Increased the space high threshold for Earth from 35786 km to 40000 km (issue #313)
     - Decreased the flying high threshold for Earth from 50 km to 40 km (matches the RP-1 value)
     - Increased the camera far clipping planes from ~1.9 Mm to 3 Mm (ported from RSSVE)
     - Fixed the Sun light parameters for compatibility with the newer Kopernicus versions
-    - Fixed the CommNet patch to handle parts with more that one "ModuleDataTransmitter" modules
+    - Fixed the CommNet patch being unable handle parts with more that one "ModuleDataTransmitter" modules
     - Fixed the science definitions for compatibility with the newer Module Manager versions (pull #315)
-    - Fixed the Titan AFG parameters for a smoother transition
+    - Fixed the Venus, Earth, Mars and Titan AFG parameters for a smoother transition
     - Fixed the overexposed specular reflections of the gas giants
     - Fixed the TextureReplacer compatibility patch to edit the existing node instead of creating a new one
+    - Fixed the description localization for Oberon and Umbriel
+    - Fixed the PQS/SS transition altitudes of Miranda, Ariel, Umbriel, Titania and Oberon
+    - Fixed the incorrect color of Neptune (part of the "RSS-Textures" package).
+    - Added the missing AFG node of Neptune
     - Updated the Triton rotation period to use a hard-coded value (RSS now uses gravitational parameters for all bodies)
     - Updated the Pluto and Charon rotation period to use hard-coded values (RSS now uses gravitational parameters for all bodies)
-    - Updated all PQS material nodes to use stock KSP textures (workaround until the RSS-supplied terrain detail textures are fixed)
+    - Reverted many PQS material nodes to use stock KSP terrain detail textures instead of the RSS-supplied ones (workaround until they are fixed)
 
 Known Issues:
 
-    - The oblate feature for the gas giants does not work
+    - The oblate feature for the gas giants does not work (Kopernicus bug)
     - The KSC monolith cannot be removed (it is part of the space center mesh)
     - The Sun has the stock yellow appearance instead of being white
-    - The terrain detail textures have incorrect glossiness factors
-    - The transition between SS and PQS for Vesta does not occur at the same altitude
+    - Some terrain detail textures have incorrect glossiness factors
+    - Triton and Pluto do not implement AFG even if they have atmospheres
