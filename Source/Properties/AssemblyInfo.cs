@@ -44,5 +44,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("18.5.0.0")]
 #endif
 
+[assembly: KSPAssembly("RealSolarSystem", 21, 0, 0)]
 [assembly: KSPAssemblyDependency("Kopernicus", 1, 0)]
 [assembly: KSPAssemblyDependency("Kopernicus.Parser", 1, 0)]
