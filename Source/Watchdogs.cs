@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Rendering;
+using System.Linq;
 
 namespace RealSolarSystem
 {
@@ -19,8 +20,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
-                rssSettings = node;
+            rssSettings = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("ClipPlanes"));
 
             GameEvents.onVesselSOIChanged.Add(OnVesselSOIChanged);
             GameEvents.onVesselSituationChange.Add(OnVesselSituationChanged);
@@ -47,7 +47,9 @@ namespace RealSolarSystem
             Camera[] cameras = Camera.allCameras;
             string bodyName = FlightGlobals.getMainBody().name;
 
-            ConfigNode clipPlaneSettings;
+            if (rssSettings == null) return;
+
+            ConfigNode clipPlaneSettings = null;
             if (SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D11 ||
                 SystemInfo.graphicsDeviceType == GraphicsDeviceType.Direct3D12)
             {
