@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 using static RunwayCollisionHandler;
 
@@ -43,17 +44,16 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            foreach (ConfigNode n in GameDatabase.Instance.GetConfigNodes("RSSRUNWAYFIX"))
-            {
-                if (bool.TryParse(n.GetValue("debug"), out bool bTemp))
-                {
-                    debug = bTemp;
-                }
+            ConfigNode node = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("RSSRUNWAYFIX"));
 
-                if (float.TryParse(n.GetValue("holdThreshold"), out float fTemp))
-                {
-                    holdThreshold = fTemp;
-                }
+            if (bool.TryParse(node.GetValue("debug"), out bool bTemp))
+            {
+                debug = bTemp;
+            }
+
+            if (float.TryParse(node.GetValue("holdThreshold"), out float fTemp))
+            {
+                holdThreshold = fTemp;
             }
 
             GameEvents.onVesselGoOffRails.Add(OnVesselGoOffRails);
