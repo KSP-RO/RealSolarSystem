@@ -46,14 +46,17 @@ namespace RealSolarSystem
         {
             ConfigNode node = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("RSSRUNWAYFIX"));
 
-            if (bool.TryParse(node.GetValue("debug"), out bool bTemp))
+            if (node != null)
             {
-                debug = bTemp;
-            }
+                if (bool.TryParse(node.GetValue("debug"), out bool bTemp))
+                {
+                    debug = bTemp;
+                }
 
-            if (float.TryParse(node.GetValue("holdThreshold"), out float fTemp))
-            {
-                holdThreshold = fTemp;
+                if (float.TryParse(node.GetValue("holdThreshold"), out float fTemp))
+                {
+                    holdThreshold = fTemp;
+                }
             }
 
             GameEvents.onVesselGoOffRails.Add(OnVesselGoOffRails);
