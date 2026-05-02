@@ -1,5 +1,6 @@
 using CommNet;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace RealSolarSystem
@@ -19,23 +20,25 @@ namespace RealSolarSystem
 
                 Debug.Log("[RealSolarSystem] Checking for custom CommNet settings...");
 
-                foreach (ConfigNode RSSSettings in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
+                ConfigNode node = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault();
+
+                if (node != null)
                 {
-                    RSSSettings.TryGetValue("overrideCommNetParams", ref overrideCommNetParams);
-                    RSSSettings.TryGetValue("enableGroundStations", ref enableExtraGroundStations);
-                    RSSSettings.TryGetValue("occlusionMultiplierAtm", ref occlusionMultiplierInAtm);
-                    RSSSettings.TryGetValue("occlusionMultiplierVac", ref occlusionMultiplierInVac);
-                }
+                    node.TryGetValue("overrideCommNetParams", ref overrideCommNetParams);
+                    node.TryGetValue("enableGroundStations", ref enableExtraGroundStations);
+                    node.TryGetValue("occlusionMultiplierAtm", ref occlusionMultiplierInAtm);
+                    node.TryGetValue("occlusionMultiplierVac", ref occlusionMultiplierInVac);
 
-                if (overrideCommNetParams)
-                {
-                    //  Set the default CommNet parameters for RealSolarSystem.
+                    if (overrideCommNetParams)
+                    {
+                        //  Set the default CommNet parameters for RealSolarSystem.
 
-                    Debug.Log("[RealSolarSystem] Updating the CommNet settings...");
+                        Debug.Log("[RealSolarSystem] Updating the CommNet settings...");
 
-                    HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().enableGroundStations = enableExtraGroundStations;
-                    HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierAtm = occlusionMultiplierInAtm;
-                    HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierVac = occlusionMultiplierInVac;
+                        HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().enableGroundStations = enableExtraGroundStations;
+                        HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierAtm = occlusionMultiplierInAtm;
+                        HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierVac = occlusionMultiplierInVac;
+                    }
                 }
             }
             catch (Exception exceptionStack)
