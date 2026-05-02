@@ -25,7 +25,7 @@ namespace RealSolarSystem
             {
                 fixedTimeWarp = true;
 
-                ConfigNode twNode = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("timeWarpRates"));
+                ConfigNode twNode = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("timeWarpRates"))?.GetNode("timeWarpRates");
 
                 if (twNode != null)
                 {

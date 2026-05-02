@@ -44,7 +44,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            ConfigNode node = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("RSSRUNWAYFIX"));
+            ConfigNode node = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("RSSRUNWAYFIX"))?.GetNode("RSSRUNWAYFIX");
 
             if (node != null)
             {
