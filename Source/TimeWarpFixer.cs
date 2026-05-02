@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace RealSolarSystem
 {
@@ -23,15 +24,13 @@ namespace RealSolarSystem
             if (!fixedTimeWarp && TimeWarp.fetch != null)
             {
                 fixedTimeWarp = true;
-                ConfigNode twNode = null;
 
-                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
-                    twNode = node.GetNode("timeWarpRates");
-
-                Debug.Log("[RealSolarSystem] Setting TimeWarp rates...");
+                ConfigNode twNode = GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM").FirstOrDefault(n => n.HasNode("timeWarpRates"));
 
                 if (twNode != null)
                 {
+                    Debug.Log("[RealSolarSystem] Setting TimeWarp rates...");
+
                     for (int i = 1; i < 8; i++)
                     {
                         if (twNode.HasValue("rate" + i))
