@@ -13,6 +13,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  KSP_ROOT: /tmp/ksp
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   check-secret:
@@ -49,22 +52,19 @@ jobs:
 
       - name: Download required assemblies
         id: download-assemblies
-        shell: bash
-        env:
+        uses: KSP-RO/BuildTools/download-assemblies-v2@master
+        with:
           KSP_ZIP_PASSWORD: ${{ secrets.KSP_ZIP_PASSWORD }}
-        run: |
-          curl https://ksp-ro.s3-us-west-2.amazonaws.com/KSPAssemblies-1.12.zip --output /tmp/bins.zip
-          KSP_DLL_PATH="/opt/ksp/assembly"
-          echo "::set-output name=ksp-dll-path::${KSP_DLL_PATH}"
-          mkdir -p "${KSP_DLL_PATH}"
-          unzip -P "${KSP_ZIP_PASSWORD}" '/tmp/bins.zip' -d "${KSP_DLL_PATH}"
-          rm '/tmp/bins.zip'
+          dependency-identifiers: |
+            Harmony2
+            Kopernicus
+            KSPBurst-Lite
+            BurstPQS
 
       - name: Build mod solution
         run: |
           rm -f ${GITHUB_WORKSPACE}/GameData/RealSolarSystem/Plugins/*.dll
-          msbuild /p:Configuration=Release /p:ReferencePath="${{ steps.download-assemblies.outputs.ksp-dll-path }}" ${GITHUB_WORKSPACE}/Source/RealSolarSystem.sln
-          cp -v ${GITHUB_WORKSPACE}/Source/obj/Release/RealSolarSystem.dll ${GITHUB_WORKSPACE}/GameData/RealSolarSystem/Plugins/RealSolarSystem.dll
+          msbuild /p:Configuration=Release /p:ReferencePath="${{ steps.download-assemblies.outputs.ksp-dll-path }}" /p:KSPRoot="${{ env.KSP_ROOT }}" ${GITHUB_WORKSPACE}/Source/RealSolarSystem.sln
 
       - name: Remove excess DLLs
         uses: KSP-RO/BuildTools/remove-excess-dlls@master

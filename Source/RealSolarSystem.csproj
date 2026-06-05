@@ -56,35 +56,49 @@
     <Compile Include="VesselGroundPositionEnhancer.cs" />
     <Compile Include="Watchdogs.cs" />
   </ItemGroup>
+  <PropertyGroup>
+    <KSPRoot Condition=" '$(KSPRoot)' == '' ">
+      $(ReferencePath.TrimEnd([System.IO.Path]::DirectorySeparatorChar))</KSPRoot>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony">
+    <Reference Include="$(KSPRoot)/GameData/000_Harmony/0Harmony.dll">
+      <HintPath>$(ReferencePath)/0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/Assembly-CSharp.dll">
+      <HintPath>$(ReferencePath)/Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Kopernicus">
+    <Reference Include="$(KSPRoot)/GameData/Kopernicus/Plugins/Kopernicus.dll">
+      <HintPath>$(ReferencePath)/Kopernicus.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Kopernicus.Parser">
+    <Reference Include="$(KSPRoot)/GameData/Kopernicus/Plugins/Kopernicus.Parser.dll">
+      <HintPath>$(ReferencePath)/Kopernicus.Parser.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/System.dll">
+      <HintPath>$(ReferencePath)/System.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/UnityEngine.dll">
+      <HintPath>$(ReferencePath)/UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/UnityEngine.CoreModule.dll">
+      <HintPath>$(ReferencePath)/UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.IMGUIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/UnityEngine.IMGUIModule.dll">
+      <HintPath>$(ReferencePath)/UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/UnityEngine.InputLegacyModule.dll">
+      <HintPath>$(ReferencePath)/UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="$(KSPRoot)/KSP_x64_Data/Managed/UnityEngine.PhysicsModule.dll">
+      <HintPath>$(ReferencePath)/UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
