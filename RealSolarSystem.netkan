@@ -10,7 +10,6 @@ $kref: '#/ckan/github/KSP-RO/RealSolarSystem'
 $vref: '#/ckan/ksp-avc'
 x_netkan_force_v: true
 license: CC-BY-NC-SA
-release_status: stable
 resources:
   homepage: https://forum.kerbalspaceprogram.com/index.php?/topic/177216-*
 tags:
