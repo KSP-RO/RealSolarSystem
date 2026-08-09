@@ -45,6 +45,8 @@
     <Compile Include="CommNetFixer.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="HarmonyPatcher.cs" />
+    <Compile Include="Harmony\PSpaceObject.cs" />
+    <Compile Include="Harmony\SpaceObjectCollider.cs" />
     <Compile Include="Harmony\Vessel.cs" />
     <Compile Include="InstallationChecker.cs" />
     <Compile Include="KopernicusMods\PQSMod_VertexDefineCoastSmooth.cs" />
