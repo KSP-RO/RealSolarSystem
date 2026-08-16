@@ -37,6 +37,8 @@ namespace RealSolarSystem
         private string _sMinHeightOffset;
         private string _sMaxHeightOffset;
         private string _sSlopeScale;
+        private string _sCoastSpacings;
+        private string _sGradientStencil;
         private string _sRssDefineOrder;
 
         private string _sHeightStart;
@@ -228,6 +230,8 @@ namespace RealSolarSystem
                         _sMinHeightOffset = _pModRssDefine.minHeightOffset.ToString();
                         _sMaxHeightOffset = _pModRssDefine.maxHeightOffset.ToString();
                         _sSlopeScale = _pModRssDefine.slopeScale.ToString();
+                        _sCoastSpacings = _pModRssDefine.coastSpacings.ToString();
+                        _sGradientStencil = _pModRssDefine.gradientStencil.ToString();
                         _sRssDefineOrder = _pModRssDefine.order.ToString();
                     }
 
@@ -385,6 +389,24 @@ namespace RealSolarSystem
                     if (double.TryParse(_sSlopeScale, out double val))
                     {
                         _pModRssDefine.slopeScale = val;
+                    }
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("coastSpacings: ");
+                    GUILayout.EndHorizontal();
+                    _sCoastSpacings = GUILayout.TextField(_sCoastSpacings);
+                    if (double.TryParse(_sCoastSpacings, out double coastSpacings))
+                    {
+                        _pModRssDefine.coastSpacings = coastSpacings;
+                    }
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("gradientStencil (texels): ");
+                    GUILayout.EndHorizontal();
+                    _sGradientStencil = GUILayout.TextField(_sGradientStencil);
+                    if (double.TryParse(_sGradientStencil, out double gradientStencil))
+                    {
+                        _pModRssDefine.gradientStencil = gradientStencil;
                     }
 
                     GUILayout.BeginHorizontal();
