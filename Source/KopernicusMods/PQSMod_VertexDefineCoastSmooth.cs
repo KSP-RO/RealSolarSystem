@@ -16,20 +16,18 @@ namespace RealSolarSystem
         public double minHeightOffset;
         public double maxHeightOffset;
 
-        // Legacy fixed slopeScale behaviour. Has no effect in adaptive mode.
-        // This is unavoidably either too soft on flat coasts or steep enough to quantise every vertex onto the two
-        // plateaus - and once that happens the waterline snaps to the vertex grid's edge midpoints
-        // and turns into a staircase.
+        // Legacy fixed-width ramp, ignored in adaptive mode. One width is either too soft on flat
+        // coasts or so steep that every vertex lands on a plateau, which puts the waterline on the
+        // vertex grid and turns it into a staircase.
         public double slopeScale;
 
-        // Target half-width of the land/water transition, in vertex spacings of the quad being
-        // built. When positive the mod runs in adaptive mode: the ramp is sized from the local
-        // height map gradient so that the coast always crosses sea level over roughly this
-        // distance, whatever the terrain does. Zero (the default) keeps the fixed slopeScale behaviour.
-        //
-        // Spacings rather than metres because a quad's vertex spacing doubles for every subdivision
-        // level below the maximum, and the maximum itself moves with the terrain detail preset. A
-        // width fixed in metres is only correct in a shell around the camera.
+        // Half-width of the land/water transition, in vertex spacings of the quad being built.
+        // Positive enables adaptive mode, where the ramp is sized from the local height map
+        // gradient so the coast crosses sea level over this distance whatever the terrain does.
+        // Zero keeps the fixed slopeScale ramp.
+        // Spacings and not metres: spacing doubles with every subdivision level below the maximum,
+        // and the maximum moves with the terrain detail preset, so a width in metres would only be
+        // right in a shell around the camera.
         public double coastSpacings;
 
         // Half-width of the central difference used to measure that gradient, in height map texels.
@@ -39,7 +37,7 @@ namespace RealSolarSystem
         private double maxHeight;
         private double invDepth;
         private double invRise;
-        private bool bandCrossesSeaLevel;
+        private bool isActive;
 
         private bool isAdaptive;
         private MapSO heightMap;
@@ -53,10 +51,11 @@ namespace RealSolarSystem
         private double[] levelSpacing;
         private double maxLevelSpacing;
 
-        // Resolved adaptive setup. Exposed so the Burst path can mirror this mod exactly instead of
-        // repeating the height map search and re-deriving the constants - the two implementations
-        // have to agree vertex for vertex or terrain changes depending on whether BurstPQS is
-        // installed. Only meaningful while IsAdaptive is true.
+        // False when the mod has nothing valid to do, so the BurstPQS mod can skip it as well.
+        public bool IsActive => isActive;
+
+        // Resolved adaptive setup, read by the BurstPQS mod so both paths use the same map and the
+        // same constants. Only meaningful while IsAdaptive is true.
         public bool IsAdaptive => isAdaptive;
         public MapSO AdaptiveHeightMap => heightMap;
         public double AdaptiveMapDeformity => mapDeformity;
@@ -66,9 +65,7 @@ namespace RealSolarSystem
         public double AdaptiveMetresPerV => metresPerV;
 
         /// <summary>
-        /// Half-width of the ramp in metres of ground for a quad at the given subdivision level.
-        /// The Burst path resolves this once per quad rather than per vertex, since it is handed
-        /// the quad up front.
+        /// Ramp half-width in metres of ground for a quad at the given subdivision level.
         /// </summary>
         public double AdaptiveRampWidth(int subdivision)
         {
@@ -98,12 +95,9 @@ namespace RealSolarSystem
             minHeight = sphere.radius + minHeightOffset;
             maxHeight = sphere.radius + maxHeightOffset;
             isAdaptive = false;
+            isActive = false;
 
-            // The two halves of the band are scaled independently, so the offsets need not be
-            // symmetric. Dropping the seabed further than the land rises steepens the waterline
-            // without turning coastal lowland into a mesa - the deep side is hidden under the ocean.
-            bandCrossesSeaLevel = minHeightOffset < 0.0 && maxHeightOffset > 0.0;
-            if (!bandCrossesSeaLevel)
+            if (minHeightOffset >= 0.0 || maxHeightOffset <= 0.0)
             {
                 Debug.LogWarning($"[RealSolarSystem] VertexDefineCoastSmooth on {sphere.name} is inactive: band [{minHeightOffset}, {maxHeightOffset}] does not cross sea level");
                 return;
@@ -122,9 +116,18 @@ namespace RealSolarSystem
                 }
             }
 
-            // The rendered waterline sits where the mesh crosses sea level, and with different
-            // amplitudes either side the crossing is pulled towards the shallower one - a constant
-            // bias of tens of metres that no ramp width fixes. Keep the band symmetric.
+            // Reset() only runs in the editor, so an unset slopeScale is 0 and not the default
+            // above. A zero ramp maps the whole band onto sea level, which is worse than nothing.
+            if (!isAdaptive && slopeScale <= 0.0)
+            {
+                Debug.LogWarning($"[RealSolarSystem] VertexDefineCoastSmooth on {sphere.name} is inactive: adaptive mode is off and slopeScale is {slopeScale}");
+                return;
+            }
+
+            isActive = true;
+
+            // With different amplitudes either side, the mesh crosses sea level nearer the
+            // shallower one, biasing the waterline off the height map contour by tens of metres.
             if (isAdaptive && Math.Abs(maxHeightOffset + minHeightOffset) > 1E-6)
             {
                 Debug.LogWarning($"[RealSolarSystem] VertexDefineCoastSmooth on {sphere.name}:"
@@ -135,7 +138,7 @@ namespace RealSolarSystem
 
         public override void OnVertexBuildHeight(PQS.VertexBuildData data)
         {
-            if (!bandCrossesSeaLevel)
+            if (!isActive)
             {
                 return;
             }
@@ -151,10 +154,9 @@ namespace RealSolarSystem
             double t;
             if (isAdaptive)
             {
-                // Grade the coast over a fixed number of vertex spacings of whatever quad is being
-                // built, so distant low-detail quads get a proportionally wider ramp instead of
-                // collapsing onto the plateaus. buildQuad is null on the GetSurfaceHeight path,
-                // which has no mesh to grade, so answer those at the finest level.
+                // Grading over a fixed number of vertex spacings gives low-detail quads further out
+                // a proportionally wider ramp, instead of collapsing them onto the plateaus.
+                // buildQuad is null on the GetSurfaceHeight path, which has no mesh to grade.
                 double spacing = maxLevelSpacing;
                 if (data.buildQuad != null)
                 {
@@ -165,27 +167,23 @@ namespace RealSolarSystem
                     }
                 }
 
-                // Raw height the terrain gains over that distance of ground. Capping it at the band
-                // keeps the ramp finishing exactly on the plateau, with no step at the edge.
-                // Grouped so this is the same product the Burst path folds into its per-quad ramp
-                // width; multiplication is not associative in floating point and the two
-                // implementations have to agree to the last bit.
+                // Height the terrain gains over that distance. Capping at the band makes the ramp
+                // finish exactly on the plateau. The product is grouped to match the Burst path,
+                // which folds it into a per-quad width; float multiply is not associative.
                 double window = GetLocalGradient(data) * (coastSpacings * spacing);
                 window = Math.Min(window, height < 0.0 ? -minHeightOffset : maxHeightOffset);
-                // Not Math.Sign, which throws on NaN - and a NaN height slips through the band test
-                // above, since every comparison against NaN is false.
+                // Not Math.Sign, which throws on NaN, and a NaN height passes the band test above.
                 t = window > 0.0 ? height / window : (height < 0.0 ? -1.0 : (height > 0.0 ? 1.0 : 0.0));
             }
             else
             {
-                // slopeScale below 1 leaves a step at the band edges, same as it always has.
+                // slopeScale below 1 leaves a step at the band edges.
                 t = (height < 0.0 ? height * invDepth : height * invRise) * slopeScale;
             }
             t = Math.Min(Math.Max(-1.0, t), 1.0);
 
             // Odd extension of the 7th order smoothstep onto [-1, 1], i.e. 2 * S((t + 1) / 2) - 1.
-            // Sea level is an exact fixed point of this, so the waterline stays on the height
-            // map's own contour instead of drifting.
+            // Sea level is an exact fixed point, so the waterline stays on the height map contour.
             double x = (t + 1.0) * 0.5;
             double x2 = x * x;
             double s = 2.0 * (x2 * x2 * (35.0 - 84.0 * x + 70.0 * x2 - 20.0 * x2 * x)) - 1.0;
@@ -208,8 +206,8 @@ namespace RealSolarSystem
         /// </summary>
         private double GetLocalGradient(PQS.VertexBuildData data)
         {
-            // GetPixelFloat wraps both axes, which is right for longitude but would jump across the
-            // pole in v, so keep the stencil inside the map vertically.
+            // GetPixelFloat wraps both axes. Right for longitude, but in v it would jump the pole,
+            // so keep the stencil inside the map.
             double v = Math.Min(Math.Max(data.v, dv), 1.0 - dv);
 
             double dHdu = mapDeformity * invTwoDu *
@@ -217,8 +215,8 @@ namespace RealSolarSystem
             double dHdv = mapDeformity * invTwoDv *
                 (heightMap.GetPixelFloat(data.u, v + dv) - heightMap.GetPixelFloat(data.u, v - dv));
 
-            // u spans the full circumference, v spans pole to pole; meridians converge with latitude.
-            // directionFromCenter is a unit radial, so the length of its horizontal part is exactly cos(latitude)
+            // u spans the circumference, v pole to pole, and meridians converge with latitude.
+            // directionFromCenter is a unit radial, so its horizontal length is exactly cos(lat).
             Vector3d dir = data.directionFromCenter;
             double cosLat = Math.Sqrt(dir.x * dir.x + dir.z * dir.z);
             if (cosLat < 1E-3)
@@ -232,9 +230,8 @@ namespace RealSolarSystem
         }
 
         /// <summary>
-        /// Vertex spacing for every subdivision level. A quad at level L spans (pi * R / 2) / 2^L
-        /// and carries cacheSideVertCount vertices per side, so spacing doubles for each level
-        /// below the maximum - which is exactly how far a coast has to be graded to stay smooth.
+        /// Vertex spacing per subdivision level. A quad at level L spans (pi * R / 2) / 2^L across
+        /// cacheSideVertCount vertices, so spacing doubles for each level below the maximum.
         /// </summary>
         private void BuildSpacingTable()
         {
@@ -250,10 +247,9 @@ namespace RealSolarSystem
         }
 
         /// <summary>
-        /// Locates the VertexHeightMap this body's coastline comes from, so the ramp can be sized
-        /// from the map's own gradient. Sampling the map rather than differencing the mesh keeps the
-        /// measured gradient independent of subdivision level, so the waterline itself stays put as
-        /// quads split - only the steepness either side of it changes.
+        /// Finds the VertexHeightMap the coastline comes from. Sampling the map instead of
+        /// differencing the mesh keeps the gradient independent of subdivision level, so the
+        /// waterline stays put as quads split and only the steepness either side changes.
         /// </summary>
         private bool BindHeightMap()
         {
@@ -273,13 +269,13 @@ namespace RealSolarSystem
 
             if (best == null)
             {
-                Debug.LogWarning($"[RealSolarSystem] VertexDefineCoastSmooth on {sphere.name}: coastWidth is set but no VertexHeightMap was found, falling back to fixed slopeScale");
+                Debug.LogWarning($"[RealSolarSystem] VertexDefineCoastSmooth on {sphere.name}: coastSpacings is set but no VertexHeightMap was found, falling back to fixed slopeScale");
                 return false;
             }
 
             heightMap = best.heightMap;
-            // The stock mod adds heightMapOffset + heightMapDeformity * pixel; the offset is constant
-            // and drops out of a difference, so only the deformity scales the gradient.
+            // The stock mod adds offset + deformity * pixel. The offset is constant and cancels in
+            // a difference, so only the deformity scales the gradient.
             mapDeformity = best.heightMapDeformity;
 
             double stencil = gradientStencil > 0.0 ? gradientStencil : 1.0;

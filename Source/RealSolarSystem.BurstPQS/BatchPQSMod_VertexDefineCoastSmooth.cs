@@ -19,10 +19,9 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
     {
         base.OnSetup();
 
-        // The stock mod has already resolved which height map the coastline comes from; all this
-        // has to decide is whether BurstPQS can read it. If it cannot, fall back to the fixed
-        // slopeScale ramp and say so, because silently dropping adaptive mode here would make the
-        // terrain depend on whether BurstPQS happens to be installed.
+        // The stock mod has already picked the height map, so this only decides whether BurstPQS
+        // can read it. Falling back quietly would make terrain depend on whether BurstPQS is
+        // installed, so say so in the log.
         _mapSupported = Mod.IsAdaptive
             && Mod.AdaptiveHeightMap != null
             && BurstMapSO.IsSupported(Mod.AdaptiveHeightMap);
@@ -39,13 +38,14 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
     {
         base.OnQuadPreBuild(quad, jobSet);
 
-        double minHeightOffset = Mod.minHeightOffset;
-        double maxHeightOffset = Mod.maxHeightOffset;
-        if (minHeightOffset >= 0.0 || maxHeightOffset <= 0.0)
+        // The stock mod has already validated the offsets and logged if they are unusable.
+        if (!Mod.IsActive)
         {
-            // Band does not straddle sea level; the stock mod logs this and goes inert.
             return;
         }
+
+        double minHeightOffset = Mod.minHeightOffset;
+        double maxHeightOffset = Mod.maxHeightOffset;
 
         BuildJob job = new BuildJob
         {
@@ -71,8 +71,7 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
             job.metresPerU = Mod.AdaptiveMetresPerU;
             job.metresPerV = Mod.AdaptiveMetresPerV;
 
-            // The subdivision level is known here, so the ramp width is resolved once per quad
-            // instead of once per vertex the way the stock path has to do it.
+            // The level is known here, so the ramp width is per quad rather than per vertex.
             job.rampWidth = Mod.AdaptiveRampWidth(quad.subdivision);
         }
 
@@ -125,8 +124,8 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
                 double t;
                 if (isAdaptive)
                 {
-                    // Raw height the terrain gains over rampWidth metres of ground. Capping it at
-                    // the band keeps the ramp finishing exactly on the plateau, with no step.
+                    // Height the terrain gains over rampWidth of ground. Capping at the band makes
+                    // the ramp finish exactly on the plateau.
                     double window = Gradient(uCoord[i], vCoord[i], direction[i]) * rampWidth;
                     window = Math.Min(window, height < 0.0 ? -minHeightOffset : maxHeightOffset);
                     t = window > 0.0 ? height / window : (height < 0.0 ? -1.0 : (height > 0.0 ? 1.0 : 0.0));
@@ -138,8 +137,7 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
                 t = Math.Min(Math.Max(-1.0, t), 1.0);
 
                 // Odd extension of the 7th order smoothstep onto [-1, 1], i.e. 2 * S((t + 1) / 2) - 1.
-                // Sea level is an exact fixed point of this, so the waterline stays on the height
-                // map's own contour instead of drifting.
+                // Sea level is an exact fixed point, so the waterline stays on the height map contour.
                 double x = (t + 1.0) * 0.5;
                 double x2 = x * x;
                 double s = 2.0 * (x2 * x2 * (35.0 - 84.0 * x + 70.0 * x2 - 20.0 * x2 * x)) - 1.0;
@@ -149,13 +147,13 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
         }
 
         /// <summary>
-        /// Magnitude of the height map's slope at this vertex, in metres of rise per metre
-        /// travelled. Must stay in step with PQSMod_VertexDefineCoastSmooth.LocalGradient.
+        /// Height map slope at this vertex, in metres of rise per metre travelled. Must stay in
+        /// step with PQSMod_VertexDefineCoastSmooth.GetLocalGradient.
         /// </summary>
         private double Gradient(double u, double v, Vector3d dir)
         {
-            // GetPixelFloat wraps both axes, which is right for longitude but would jump across the
-            // pole in v, so keep the stencil inside the map vertically.
+            // GetPixelFloat wraps both axes. Right for longitude, but in v it would jump the pole,
+            // so keep the stencil inside the map.
             v = Math.Min(Math.Max(v, dv), 1.0 - dv);
 
             double dHdu = mapDeformity * invTwoDu *
@@ -163,8 +161,7 @@ public class BatchPQSMod_VertexDefineCoastSmooth : BatchPQSMod<PQSMod_VertexDefi
             double dHdv = mapDeformity * invTwoDv *
                 (heightMap.GetPixelFloat(u, v + dv) - heightMap.GetPixelFloat(u, v - dv));
 
-            // directionFromCenter is a unit radial, so the length of its horizontal part is exactly
-            // cos(latitude), which is cheaper than Math.Cos and avoids needing the latitude span.
+            // directionFromCenter is a unit radial, so its horizontal length is exactly cos(lat).
             double cosLat = Math.Sqrt(dir.x * dir.x + dir.z * dir.z);
             if (cosLat < 1E-3)
             {
