@@ -360,3 +360,14 @@ Eris
 		base prestige = 10000
 	}
 }
+
+Sun
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/PluginData/Ribbons
+		ribbon group = Sun
+		base prestige = 20000
+	}
+}
