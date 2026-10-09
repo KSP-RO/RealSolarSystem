@@ -15,28 +15,33 @@ Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propu
 DEPENDENCIES:
 CustomBarnKit (by sarbian). See GitHub repository for details, license, and source: https://github.com/sarbian/CustomBarnKit
 KSCSwitcher (by regex, NathanKell, and jbengtson). See GitHub repository for details, license, and source: https://github.com/KSP-RO/KSCSwitcher
-Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=181547
-Module Manager (by sarbian, swamp_ig, and ialdabaoth). See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=50533
+Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See GitHub repository for details, license, and source: https://github.com/Kopernicus/Kopernicus
+Module Manager (by sarbian, swamp_ig, and ialdabaoth). See GitHub repository for details, license, and source: https://github.com/sarbian/ModuleManager
 
 INSTALLATION:
 Install the above dependencies, as per the instructions of each one, to KSP/GameData.
 Extract RealSolarSystem to KSP/GameData. You should now have one .dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
 
 TEXTURE INSTALLATION:
-Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution textures. Note that 8192 is dangerous, since you may easily run out of memory.
+Now, you must select a texture resolution. Download a premade pack (16384, 8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution textures. Note that 16384 is dangerous, since you may easily run out of memory.
 
-You can get the textures from: https://github.com/KSP-RO/ScaledRSS-Textures
+You can get the textures from: https://github.com/KSP-RO/RSS-Textures
 Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repository itself).
 NOTE: The folder is "RSS-Textures"
 
 SUGGESTED MODS:
 RealSolarSystem ships with configurations for many other mods:
 
-- Custom Asteroids by Starstrider42. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72785
-- Ferram Aerospace Research by ferram4. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=19321
-- Not In My BackYard by magico13, and LinuxGuruGamer. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=178484
-- PlanetShine by Valerian, and Papa_Joe. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?/showtopic=173138
-- TextureReplacer by shaw. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=96851
+- BetterTimeWarp by MrHappyFace, and LinuxGuruGamer. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=154935
+- Custom Asteroids by Starstrider42. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72785
+- Ferram Aerospace Research by ferram4. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=19321
+- KerbalWind by DaMichel, and RCrockford. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=195587
+- Not In My BackYard by magico13, and LinuxGuruGamer. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=178484
+- PlanetShine by Valerian, and Papa_Joe. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?/showtopic=173138
+- Rational Resources by JadeOfMaar. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=184875
+- RealAntennas by DRVeyl, and KSP-RO Team. See GitHub repository for details, license, and source: https://github.com/KSP-RO/RealAntennas
+- SCANsat by DMagic, and KSPModStewards. See GitHub repository for details, license, and source: https://github.com/KSPModStewards/SCANsat
+- TextureReplacer by shaw. See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=96851
 
 FINAL NOTES:
 You really should play with the recommended mods. See the Realism Overhaul thread for details.
