@@ -21,7 +21,6 @@ depends:
   - name: ModuleManager
   - name: Kopernicus
     min_version: 2:release-1.12.1-161
-    max_version: 2:release-1.12.1-251
     suppress_recommendations: true
   - name: RSSTextures
   - name: KSPCommunityFixes
