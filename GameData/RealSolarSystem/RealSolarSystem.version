@@ -1,12 +1,12 @@
 {
     "NAME": "RealSolarSystem",
     "URL": "https://github.com/KSP-RO/RealSolarSystem/raw/master/GameData/RealSolarSystem/RealSolarSystem.version",
-    "DOWNLOAD": "https://github.com/KSP-RO/RealSolarSystem/releases/download/v20.1.3.0/RealSolarSystem_v20.1.3.0.zip",
+    "DOWNLOAD": "https://github.com/KSP-RO/RealSolarSystem/releases/download/v20.2.0.0/RealSolarSystem_v20.2.0.0.zip",
     "HOMEPAGE": "https://github.com/KSP-RO/RealSolarSystem/",
     "VERSION": {
         "MAJOR": 20,
-        "MINOR": 1,
-        "PATCH": 3,
+        "MINOR": 2,
+        "PATCH": 0,
         "BUILD": 0
     },
     "KSP_VERSION": {
