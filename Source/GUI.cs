@@ -154,6 +154,34 @@ namespace RealSolarSystem
             GUILayout.Label(RSSRunwayFix.Instance.lastHitColliderName, GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
+            RSSWatchDog watchDog = RSSWatchDog.Instance;
+            if (watchDog != null)
+            {
+                GUILayout.Label("--------------");
+                GUILayout.Label("Dynamic far clip (" + RSSWatchDog.DynamicFarClipCamName + ")");
+
+                GUILayout.BeginHorizontal();
+                bool dynEnabled = GUILayout.Toggle(watchDog.DynamicFarClipEnabled, "Enabled (off = fixed base value)");
+                if (dynEnabled != watchDog.DynamicFarClipEnabled)
+                    watchDog.SetDynamicFarClipEnabled(dynEnabled);
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("current: ");
+                GUILayout.Label(watchDog.CurrentFarClip.ToString("N0"), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("base: ");
+                GUILayout.Label(watchDog.BaseFarClip.ToString("N0"), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("horizon mult: ");
+                GUILayout.Label(watchDog.FarClipHorizonMult.ToString("0.###"), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+            }
+
             if (_cams != null)
             {
                 GUILayout.Label("--------------");

@@ -26,7 +26,10 @@ namespace RealSolarSystem
                             cam.depth = ftmp;
 
                         if (float.TryParse(farClipPlane, out ftmp))
+                        {
                             cam.farClipPlane = ftmp;
+                            RSSWatchDog.Instance?.SetBaseFarClip(cam, ftmp);
+                        }
 
                         if (float.TryParse(nearClipPlane, out ftmp))
                             cam.nearClipPlane = ftmp;
