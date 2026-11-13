@@ -73,6 +73,7 @@
     <ProjectReference Include="..\RealSolarSystem.csproj">
       <Project>{685bbbd5-86fa-43b0-bcad-72328d37ac94}</Project>
       <Name>RealSolarSystem</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
